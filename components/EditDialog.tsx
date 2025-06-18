@@ -44,7 +44,9 @@ export default function EditTaskDialog({ task, onClose }: Props) {
       (form.status === "PROGRESS" || form.status === "DONE") &&
       Number(form.progress) < 20
     ) {
-      toast.error("Task progress must be at least 20% to be In Progress.");
+      toast.error(
+        `Task progress must be at least 20% to be in ${form.status.toLowerCase()}`
+      );
       return;
     }
 

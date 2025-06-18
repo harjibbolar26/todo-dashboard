@@ -1,5 +1,7 @@
 import { ICONS } from "@/assets/Icons";
 import React, { useState, useTransition } from "react";
+import { useDraggable } from "@dnd-kit/core";
+import { CSS } from "@dnd-kit/utilities";
 import { Progress } from "./ui/progress";
 import { Task } from "@/types";
 import { twMerge } from "tailwind-merge";
@@ -23,13 +25,33 @@ import { toast } from "react-toastify";
 import EditTaskDialog from "./EditDialog";
 import { Skeleton } from "./ui/skeleton";
 
-const TaskCard = ({ task }: { task: Task }) => {
+interface TaskCardProps {
+  task: Task;
+  isDragging?: boolean;
+}
+
+const TaskCard = ({ task, isDragging = false }: TaskCardProps) => {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const { deleteTask } = useTasks();
 
   const [isDeleting, startTransition] = useTransition();
+
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    isDragging: isBeingDragged,
+  } = useDraggable({
+    id: task.id,
+    disabled: isDragging, // Disable dragging for overlay
+  });
+
+  const style = {
+    transform: CSS.Translate.toString(transform),
+  };
 
   const handleDelete = () => {
     if (selectedTask) {
@@ -45,7 +67,15 @@ const TaskCard = ({ task }: { task: Task }) => {
 
   return (
     <div className="">
-      <div className="bg-white dark:bg-[#292B31] rounded-[12px] p-6 border-2 border-[#1C1D220F]">
+      <div
+        ref={setNodeRef}
+        style={style}
+        {...attributes}
+        {...listeners}
+        className={`bg-white dark:bg-[#292B31] rounded-[12px] p-6 border-2 border-[#1C1D220F] transition-all duration-200 cursor-grab active:cursor-grabbing max-lg:min-w-[320px] ${
+          isBeingDragged ? "opacity-50 rotate-2 scale-105 shadow-lg" : ""
+        } ${isDragging ? "cursor-default" : ""} hover:shadow-md`}
+      >
         <div className="flex items-center justify-between">
           <div className="">
             <p className="text-primary font-bold max-lg:text-sm">
@@ -55,31 +85,36 @@ const TaskCard = ({ task }: { task: Task }) => {
               {task.category}
             </p>
           </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <div className="border-2 border-border rounded-full w-[26px] h-[26px] flex items-center justify-center cursor-pointer">
-                <ICONS.HorizontalEllipsis />
-              </div>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem
-                onSelect={() => {
-                  setSelectedTask(task);
-                  setOpenEditDialog(true);
-                }}
-              >
-                Edit task
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onSelect={() => {
-                  setSelectedTask(task);
-                  setOpenDeleteDialog(true);
-                }}
-              >
-                Delete task
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {!isDragging && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <div
+                  className="border-2 border-border rounded-full w-[26px] h-[26px] flex items-center justify-center cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <ICONS.HorizontalEllipsis />
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem
+                  onSelect={() => {
+                    setSelectedTask(task);
+                    setOpenEditDialog(true);
+                  }}
+                >
+                  Edit task
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onSelect={() => {
+                    setSelectedTask(task);
+                    setOpenDeleteDialog(true);
+                  }}
+                >
+                  Delete task
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
         <div className="mt-[22px]">
           <div className="flex items-center justify-between">
@@ -123,35 +158,40 @@ const TaskCard = ({ task }: { task: Task }) => {
           </div>
         </div>
       </div>
-      <Dialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              Are you sure you want to delete this task?
-            </DialogTitle>
-            <DialogDescription>
-              This action cannot be undone. This will permanently delete your
-              task from the dashboard.
-            </DialogDescription>
-          </DialogHeader>
 
-          <DialogFooter className="flex gap-6">
-            <Button variant="secondary">Cancel</Button>
-            <Button
-              variant="destructive"
-              onClick={handleDelete}
-              disabled={isDeleting}
-            >
-              {isDeleting ? "Deleting..." : "Delete"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      {openEditDialog && selectedTask && (
-        <EditTaskDialog
-          task={selectedTask}
-          onClose={() => setOpenEditDialog(false)}
-        />
+      {!isDragging && (
+        <>
+          <Dialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>
+                  Are you sure you want to delete this task?
+                </DialogTitle>
+                <DialogDescription>
+                  This action cannot be undone. This will permanently delete
+                  your task from the dashboard.
+                </DialogDescription>
+              </DialogHeader>
+
+              <DialogFooter className="flex gap-6">
+                <Button variant="secondary">Cancel</Button>
+                <Button
+                  variant="destructive"
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                >
+                  {isDeleting ? "Deleting..." : "Delete"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+          {openEditDialog && selectedTask && (
+            <EditTaskDialog
+              task={selectedTask}
+              onClose={() => setOpenEditDialog(false)}
+            />
+          )}
+        </>
       )}
     </div>
   );
@@ -160,7 +200,7 @@ const TaskCard = ({ task }: { task: Task }) => {
 export default TaskCard;
 
 export const TaskCardLoader = () => (
-  <Skeleton className="rounded-[12px] bg-muted/50 dark:bg-muted/30 border-2 border-border p-6">
+  <Skeleton className="rounded-[12px] bg-muted/50 dark:bg-muted/30 border-2 border-border p-6 max-lg:min-w-[320px]">
     <div>
       <Skeleton className="h-5 w-full rounded-2xl bg-gray-200 dark:bg-gray-700" />
       <Skeleton className="h-3 w-full mt-2 rounded-2xl bg-gray-200 dark:bg-gray-700" />

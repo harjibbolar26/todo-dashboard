@@ -4,8 +4,14 @@ import React, { useState } from "react";
 import { ThemeToggle } from "./theme-toggle";
 import { ICONS } from "@/assets/Icons";
 import { twMerge } from "tailwind-merge";
+import { X } from "lucide-react";
+import { useTasks } from "@/hooks/useTasks";
 
-const Projects = () => {
+const Projects = ({
+  setShowMenu,
+}: {
+  setShowMenu?: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
   const [expandedSections, setExpandedSections] = useState({
     projects: false,
     tasks: false,
@@ -18,8 +24,20 @@ const Projects = () => {
     }));
   };
 
+  const { tasks } = useTasks();
+
+  const todo = tasks.filter((t) => t.status === "TODO");
+  const progress = tasks.filter((t) => t.status === "PROGRESS");
+  const done = tasks.filter((t) => t.status === "DONE");
+
   return (
-    <div className="bg-background1 min-h-screen px-7 py-8 overflow-y-auto flex flex-col hide-scrollbar">
+    <div className="bg-background1 h-screen px-7 py-8 overflow-y-auto flex flex-col hide-scrollbar z-50">
+      <div
+        className="flex justify-end lg:hidden mb-4"
+        onClick={() => setShowMenu && setShowMenu(false)}
+      >
+        <X />
+      </div>
       <div className="flex items-center justify-between">
         <p className="text-primary font-bold lg:text-[30px] text-2xl">
           Projects
@@ -61,7 +79,7 @@ const Projects = () => {
               <div className="flex items-center gap-3">
                 <div className="p-1 border-l-2 border-border relative">
                   <p className="ml-4 text-subdued font-semibold hover:bg-[#1C1D220A] hover:dark:bg-[#FFFFFF0A] cursor-pointer rounded-[18px] py-[10px] px-[18px] hover:text-primary">
-                    All projects (3)
+                    All projects ({tasks.length})
                   </p>
                   <hr className="absolute transform -translate-y-1/2 top-1/2 left-0 w-3 border border-border" />
                 </div>
@@ -118,7 +136,7 @@ const Projects = () => {
               <div className="flex items-center gap-3">
                 <div className="p-1 border-l-2 border-border relative">
                   <p className="ml-4 text-subdued font-semibold hover:bg-[#1C1D220A] hover:dark:bg-[#FFFFFF0A] cursor-pointer rounded-[18px] py-[10px] px-[18px] hover:text-primary">
-                    All tasks (11)
+                    All tasks ({tasks.length})
                   </p>
                   <hr className="absolute transform -translate-y-1/2 top-1/2 left-0 w-3 border border-border" />
                 </div>
@@ -126,7 +144,7 @@ const Projects = () => {
               <div className="flex items-center gap-3">
                 <div className="p-1 border-l-2 border-border relative">
                   <p className="ml-4 text-subdued font-semibold hover:bg-[#1C1D220A] hover:dark:bg-[#FFFFFF0A] cursor-pointer rounded-[18px] py-[10px] px-[18px] hover:text-primary">
-                    To do (4)
+                    To do ({todo.length})
                   </p>
                   <hr className="absolute transform -translate-y-1/2 top-1/2 left-0 w-3 border border-border" />
                 </div>
@@ -134,7 +152,7 @@ const Projects = () => {
               <div className="flex items-center gap-3">
                 <div className="p-1 border-l-2 border-border relative">
                   <p className="ml-4 text-subdued font-semibold hover:bg-[#1C1D220A] hover:dark:bg-[#FFFFFF0A] cursor-pointer rounded-[18px] py-[10px] px-[18px] hover:text-primary">
-                    In progress (4)
+                    In progress ({progress.length})
                   </p>
                   <hr className="absolute transform -translate-y-1/2 top-1/2 left-0 w-3 border border-border" />
                 </div>
@@ -142,7 +160,7 @@ const Projects = () => {
               <div className="flex items-center gap-3">
                 <div className="p-1 border-l-2 border-border relative">
                   <p className="ml-4 text-subdued font-semibold hover:bg-[#1C1D220A] hover:dark:bg-[#FFFFFF0A] cursor-pointer rounded-[18px] py-[10px] px-[18px] hover:text-primary">
-                    Done (3)
+                    Done ({done.length})
                   </p>
                   <hr className="absolute transform -translate-y-1/2 top-1/2 left-0 w-3 border border-border" />
                 </div>

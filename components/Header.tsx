@@ -21,10 +21,10 @@ const Header = () => {
             </p>
           </div>
           <div className="flex items-center gap-5">
-            <ICONS.Search />
-            <ICONS.Notification />
-            <ICONS.Calendar />
-            <p className="font-semibold text-subdued">
+            <ICONS.Search className="max-md:hidden" />
+            <ICONS.Notification className="max-md:hidden" />
+            <ICONS.Calendar className="max-md:hidden" />
+            <p className="font-semibold text-subdued max-md:hidden">
               {new Date()
                 .toLocaleDateString("en-GB", {
                   day: "2-digit",
@@ -44,16 +44,23 @@ const Header = () => {
         </div>
       </div>
       {showMenu && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-30">
-          <div className="flex z-50">
-            <div className="fixed inset-0 w-[90px]">
+        <>
+          {/* Overlay for background - closes menu */}
+          <div
+            className="fixed inset-0 bg-black/30 backdrop-blur-sm z-30"
+            onClick={() => setShowMenu(false)}
+          />
+
+          {/* Menu content - should not close menu when clicked */}
+          <div className="fixed inset-0 flex z-50 pointer-events-none">
+            <div className="w-[90px] pointer-events-auto">
               <Sidebar />
             </div>
-            <div className="ml-[90px] w-[300px] fixed inset-0">
-              <Projects />
+            <div className="w-[300px] pointer-events-auto">
+              <Projects setShowMenu={setShowMenu} />
             </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );

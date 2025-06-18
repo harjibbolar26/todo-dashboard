@@ -8,15 +8,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function Home() {
   return (
-    <div className="m-8">
+    <div className="lg:m-8 m-4">
       {/* <Menu /> */}
       <Tabs defaultValue="view" className="w-full">
-        <div className="flex justify-between items-center">
+        <div className="flex md:flex-row flex-col gap-1 justify-between lg:items-center">
           <TabsList>
             <TabsTrigger value="view">
               <div className="flex items-center gap-2">
                 <ICONS.Board />
-                <p className="text-primary font-semibold">Board view</p>
+                <p className="text-primary font-semibold max-md:text-sm">Board view</p>
               </div>
             </TabsTrigger>
             <TabsTrigger value="add">
@@ -24,7 +24,7 @@ export default function Home() {
                 <div className="bg-background2 p-2 rounded-full">
                   <ICONS.Plus />
                 </div>
-                <p className="text-primary font-semibold">Add view</p>
+                <p className="text-primary font-semibold max-md:text-sm">Add view</p>
               </div>
             </TabsTrigger>
           </TabsList>
