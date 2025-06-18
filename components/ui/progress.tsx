@@ -6,12 +6,18 @@ import * as ProgressPrimitive from "@radix-ui/react-progress";
 import { cn } from "@/lib/utils";
 import { twMerge } from "tailwind-merge";
 
+interface CustomProgressProps
+  extends React.ComponentProps<typeof ProgressPrimitive.Root> {
+  value?: number;
+  valueBg?: string;
+}
+
 function Progress({
   className,
   value,
   valueBg,
   ...props
-}: React.ComponentProps<typeof ProgressPrimitive.Root>) {
+}: CustomProgressProps) {
   return (
     <ProgressPrimitive.Root
       data-slot="progress"
