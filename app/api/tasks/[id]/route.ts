@@ -4,11 +4,12 @@ import { prisma } from "@/lib/prisma";
 // GET - Fetch a single task
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const resolvedParams = await params;
     const task = await prisma.task.findUnique({
-      where: { id: params.id },
+      where: { id: resolvedParams.id },
     });
 
     if (!task) {
@@ -28,14 +29,15 @@ export async function GET(
 // PUT - Update a task
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const resolvedParams = await params;
     const body = await request.json();
     const { title, category, progress, date, status } = body;
 
     const task = await prisma.task.update({
-      where: { id: params.id },
+      where: { id: resolvedParams.id },
       data: {
         ...(title && { title }),
         ...(category && { category }),
@@ -58,11 +60,12 @@ export async function PUT(
 // DELETE - Delete a task
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const resolvedParams = await params;
     await prisma.task.delete({
-      where: { id: params.id },
+      where: { id: resolvedParams.id },
     });
 
     return NextResponse.json({ message: "Task deleted successfully" });
