@@ -1,7 +1,6 @@
 "use client";
 
 import { useTasks } from "@/hooks/useTasks";
-import { Task } from "@/types";
 import { useState, useTransition } from "react";
 import {
   Dialog,
@@ -14,19 +13,19 @@ import { Button } from "./ui/button";
 import { toast } from "react-toastify";
 
 type Props = {
-  task: Task;
   onClose: () => void;
+  status: "TODO" | "PROGRESS" | "DONE";
 };
 
-export default function EditTaskDialog({ task, onClose }: Props) {
-  const { updateTask } = useTasks();
+export default function AddTaskDialog({ status, onClose }: Props) {
   const [form, setForm] = useState({
-    title: task.title,
-    category: task.category,
-    progress: task.progress || 0,
-    date: task.date.slice(0, 10),
-    status: task.status || "TODO",
+    title: "",
+    category: "",
+    progress: 0,
+    date: "",
   });
+
+  const { createTask } = useTasks();
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -35,34 +34,29 @@ export default function EditTaskDialog({ task, onClose }: Props) {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const [isEditing, startTransition] = useTransition();
+  const [isSubmitting, startTransition] = useTransition();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (
-      (form.status === "PROGRESS" || form.status === "DONE") &&
-      Number(form.progress) < 20
-    ) {
-      toast.error(
-        `Task progress must be at least 20% to be in ${form.status.toLowerCase()}`
-      );
-      return;
+    if (!(form.title && form.category && form.date && form.progress)) {
+      return toast.error("Please fill all valid fields");
     }
 
     try {
       startTransition(() => {
-        updateTask(task.id, {
+        createTask({
           ...form,
           progress: Number(form.progress),
           date: new Date(form.date).toISOString(),
+          status: status,
         });
-        toast.success("Task updated successfully");
+        toast.success(`Task successfully added to ${status}`);
         onClose();
       });
     } catch (error) {
-      console.error("Error updating task:", error);
-      toast.error("Failed to update task");
+      console.error("Error creating task:", error);
+      toast.error("Failed to create task");
     }
   };
 
@@ -70,9 +64,9 @@ export default function EditTaskDialog({ task, onClose }: Props) {
     <Dialog open onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Edit Task</DialogTitle>
+          <DialogTitle>Add Task to {status}</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 w-full mt-5">
           <div className="">
             <label htmlFor="title" className="text-primary font-semibold">
               Title
@@ -123,38 +117,22 @@ export default function EditTaskDialog({ task, onClose }: Props) {
               type="date"
               value={form.date}
               onChange={handleChange}
+              min={new Date().toISOString().split("T")[0]}
               className="w-full border rounded px-3 py-2 mt-2"
               required
             />
-          </div>
-          <div className="">
-            <label htmlFor="status" className="text-primary font-semibold">
-              Status
-            </label>
-            <select
-              name="status"
-              value={form.status}
-              onChange={handleChange}
-              className="w-full border rounded px-3 py-2 mt-2 dar:text-white"
-            >
-              <option value="TODO" className="dark:text-black">
-                To Do
-              </option>
-              <option value="PROGRESS" className="dark:text-black">
-                In Progress
-              </option>
-              <option value="DONE" className="dark:text-black">
-                Done
-              </option>
-            </select>
           </div>
         </form>
         <DialogFooter className="flex gap-6">
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button variant="default" onClick={handleSubmit} disabled={isEditing}>
-            {isEditing ? "Updating..." : "Update"}
+          <Button
+            variant="default"
+            onClick={handleSubmit}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Submitting..." : "Submit"}
           </Button>
         </DialogFooter>
       </DialogContent>

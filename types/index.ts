@@ -32,3 +32,5 @@ export type CreateTaskData = {
 }
 
 export type UpdateTaskData = Partial<CreateTaskData>
+
+export type SortOption = "name-asc" | "name-desc" | "date-asc" | "date-desc";

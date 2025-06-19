@@ -9,7 +9,7 @@ const NewTask = () => {
     title: "",
     category: "",
     progress: 0,
-    date: "", // format for input[type="date"]
+    date: "",
     status: "TODO",
   });
 
@@ -38,26 +38,20 @@ const NewTask = () => {
     ) {
       return toast.error("Please fill all valid fields");
     }
-    
+
     try {
       startTransition(() => {
-        // console.log({
-        //   ...form,
-        //   progress: Number(form.progress),
-        //   date: new Date(form.date).toISOString(),
-        //   status: form.status as Status,
-        // });
         createTask({
           ...form,
           progress: Number(form.progress),
           date: new Date(form.date).toISOString(),
           status: form.status as Status,
         });
-        toast.success("Task updated successfully");
+        toast.success("Task created successfully");
       });
     } catch (error) {
-      console.error("Error updating task:", error);
-      toast.error("Failed to update task");
+      console.error("Error creating task:", error);
+      toast.error("Failed to create task");
     }
   };
 

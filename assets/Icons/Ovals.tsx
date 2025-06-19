@@ -7,8 +7,8 @@ const Ovals = () => {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <circle cx="31" cy="3" r="3" fill="white" fill-opacity="0.2" />
-      <circle cx="17" cy="3" r="3" fill="white" fill-opacity="0.4" />
+      <circle cx="31" cy="3" r="3" fill="white" fillOpacity="0.2" />
+      <circle cx="17" cy="3" r="3" fill="white" fillOpacity="0.4" />
       <circle cx="3" cy="3" r="3" fill="white" />
     </svg>
   );

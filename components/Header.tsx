@@ -5,6 +5,7 @@ import Image from "next/image";
 import React, { useState } from "react";
 import Sidebar from "./Sidebar";
 import Projects from "./Projects";
+import { Menu } from "lucide-react";
 
 const Header = () => {
   const [showMenu, setShowMenu] = useState(false);
@@ -14,7 +15,7 @@ const Header = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="lg:hidden" onClick={() => setShowMenu(true)}>
-              <ICONS.Menu2 />
+              <Menu />
             </div>
             <p className="text-primary font-bold lg:text-xl text-lg">
               Welcome back, Vincent 👋
@@ -45,13 +46,11 @@ const Header = () => {
       </div>
       {showMenu && (
         <>
-          {/* Overlay for background - closes menu */}
           <div
             className="fixed inset-0 bg-black/30 backdrop-blur-sm z-30"
             onClick={() => setShowMenu(false)}
           />
 
-          {/* Menu content - should not close menu when clicked */}
           <div className="fixed inset-0 flex z-50 pointer-events-none">
             <div className="w-[90px] pointer-events-auto">
               <Sidebar />

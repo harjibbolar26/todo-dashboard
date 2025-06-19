@@ -46,7 +46,7 @@ const TaskCard = ({ task, isDragging = false }: TaskCardProps) => {
     isDragging: isBeingDragged,
   } = useDraggable({
     id: task.id,
-    disabled: isDragging, // Disable dragging for overlay
+    disabled: isDragging,
   });
 
   const style = {
